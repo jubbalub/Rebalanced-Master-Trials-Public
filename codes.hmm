@@ -1,0 +1,123 @@
+Code "Rebalanced Master Trials"
+//
+	#include "Reflection" noemit
+
+	#lib "Reflection"
+	#lib "MasterTrialParameters"
+//
+{
+	var MasterTrialParametersInfo = Reflection.GetDataInfo<MasterTrialParameters.Root>("mastertrial");
+
+	if (MasterTrialParametersInfo.pData == null)
+		return;
+
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].applicableFailedCount, 3);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].applicableFailedCount, 6);
+	
+	// Dragon's Trial (Soldier)
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[0].limitTime, 120.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[0].limitTime, 150.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[0].limitTime, 180.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[0].speedUpScale, 1.25f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[0].speedUpScale, 1.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[0].speedUpScale, 1.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[0].attackRate, 1.25f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[0].attackRate, 1.25f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[0].attackRate, 1.0f);
+	
+	// Snake's Trial (Shell)
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[1].limitTime, 90.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[1].limitTime, 120.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[1].limitTime, 150.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[1].speedUpScale, 1.5f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[1].speedUpScale, 1.3f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[1].speedUpScale, 1.0f);
+	
+	// Tiger's Trial (Wolf)
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[2].limitTime, 90.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[2].limitTime, 120.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[2].limitTime, 150.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[2].speedUpScale, 1.5f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[2].speedUpScale, 1.3f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[2].speedUpScale, 1.15f);
+	
+	// Crane's Trial (Ninja)
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[3].limitTime, 120.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[3].limitTime, 150.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[3].limitTime, 180.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[3].speedUpScale, 1.33f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[3].speedUpScale, 1.16f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[3].speedUpScale, 1.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[3].attackRate, 1.25f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[3].attackRate, 1.15f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[3].attackRate, 1.0f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[3].recoveryHpTime, 0.25f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[3].recoveryHpTime, 0.5f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[3].recoveryHpTime, 0.75f);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[0].stages[3].recoveryHpPoint, 2);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[1].stages[3].recoveryHpPoint, 2);
+	RFL_SET_PARAM(MasterTrialParametersInfo, element[2].stages[3].recoveryHpPoint, 2);
+}
+
+Library "MasterTrialParameters"
+{
+    #load "System.Numerics.dll"
+
+    using System.Numerics;
+    using System.Runtime.InteropServices;
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x24)]
+    public struct MasterTrialStageParameter
+    {
+        [FieldOffset(0x00)] public byte prerequisite;
+        [FieldOffset(0x04)] public float limitTime;
+        [FieldOffset(0x08)] public float defeatedWaitTime;
+        [FieldOffset(0x0C)] public float speedUpScale;
+        [FieldOffset(0x10)] public float attackRate;
+        [FieldOffset(0x14)] public float recoveryHpTime;
+        [FieldOffset(0x18)] public uint recoveryHpPoint;
+        [FieldOffset(0x1C)] public uint limitMistake;
+        [FieldOffset(0x20)] public int damagePoint;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x94)]
+    public struct MasterTrialParameterElement
+    {
+        [FieldOffset(0x00)] public int applicableFailedCount;
+        [FieldOffset(0x04)] public unsafe fixed byte /* MasterTrialStageParameter[4] */ _stages[144];
+
+        public unsafe MasterTrialStageParameter* stages
+        {
+            get
+            {
+                fixed (byte* p_stages = _stages)
+                    return (MasterTrialStageParameter*)p_stages;
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x1E4)]
+    public struct Root
+    {
+        [FieldOffset(0x00)] public float subjectViewTime;
+        [FieldOffset(0x04)] public float readyTime;
+        [FieldOffset(0x08)] public float clearTime;
+        [FieldOffset(0x0C)] public float failedTime;
+        [FieldOffset(0x10)] public float clearWaitTime;
+        [FieldOffset(0x14)] public float failedWaitTime;
+        [FieldOffset(0x18)] public float kodamaOrdinaryTextTime;
+        [FieldOffset(0x1C)] public float kodamaFightDelayTime;
+        [FieldOffset(0x20)] public float kodamaFightTextTime;
+        [FieldOffset(0x24)] public float kodamaSplendidTextTime;
+        [FieldOffset(0x28)] public unsafe fixed byte /* MasterTrialParameterElement[3] */ _element[444];
+
+        public unsafe MasterTrialParameterElement* element
+        {
+            get
+            {
+                fixed (byte* p_element = _element)
+                    return (MasterTrialParameterElement*)p_element;
+            }
+        }
+    }
+}

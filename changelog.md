@@ -1,3 +1,6 @@
+## Rebalanced Master Trials 1.2
+- Fixed low-time bug
+
 ## Rebalanced Master Trials 1.1
 - Update Server added
 - Crane's Trial has been overhauled:

@@ -1,3 +1,2 @@
 add mod.ini
 add codes.hmm
-add raw/gedit/w5t05_gedit.pac
